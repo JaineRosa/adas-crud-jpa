@@ -26,5 +26,18 @@ public class CaixaService {
         caixaRepository.delete(caixa);
     }
 
+    public Caixa realizarMovimentacao(int id, Double valor, String acao){
+        Caixa caixa = buscarPorId(id);
+
+        if(acao.equalsIgnoreCase("SAIDA")){
+            caixa.setSaldo(caixa.getSaldo() - valor);
+        } else if (acao.equalsIgnoreCase("ENTRADA")){
+            caixa.setSaldo(caixa.getSaldo() + valor);
+        }
+      return  salvar(caixa);
+    }
+
+
+
 
 }
