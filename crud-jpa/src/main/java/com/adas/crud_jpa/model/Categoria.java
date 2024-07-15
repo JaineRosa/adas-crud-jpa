@@ -1,35 +1,43 @@
 package com.adas.crud_jpa.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nonnull;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 
-//Define automaticamente o construtor vazio
+
+//Define automaticamente o construturo vazio da classe
 @NoArgsConstructor
-//defie automaticamento o construtor com todos os atributos.
+
+//Define automaticamente o construtor com TODOS os atributos da classe
 @AllArgsConstructor
-//Define automaticamento os metodos get e set para todos os atributos
-@Getter
-@Setter
-//Gera todas as possibilidades de construtores que não são o vazio e o cheio.
+
+//Define os getters e setters automaticamente
+//Ou pode substituir pela anotação @Data
+@Getter @Setter
+
+//Gera todas as possibilidades de construtores que nao sao os vazios ou os totalmente cheios
 @Builder
 
-//Gera automaticamente uma tabel no banco de dados, tendo as colunas dessa tabela.
-// de forma espelhada com os atributos da classe Categoria.
+//Gera automaticamente uma tabela no banco de dados, tendo as colunas dessa tabela de forma
+// espelhada com os atributos da classe categoria
 @Entity
 public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
-    @Nonnull
+    @NonNull
     private String nome;
 
+    @NonNull
     private boolean status;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "categoria")
+    private List<Produto> produtos;
 
 }

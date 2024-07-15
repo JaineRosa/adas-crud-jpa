@@ -17,124 +17,118 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
+
     @Autowired
-    private CaixaService caixaService;
+    CaixaService caixaService;
 
-    @PostMapping
-   public ResponseEntity<Produto> cadastrar(@RequestBody Produto novoProduto){
-        return ResponseEntity.ok(produtoService.salvar(novoProduto));
-        }
+    @GetMapping("/todos")
+    public ResponseEntity<List<Produto>> findAll() {
 
-        @GetMapping
-    public ResponseEntity<List<Produto>> buscarTodos(){
-        return ResponseEntity.ok(produtoService.buscarTodos());
-        }
-
-        @GetMapping("/{id}")
-
-        public ResponseEntity<Produto> buscarPorId(@PathVariable int id){
-        Produto produtoEncontrado =  produtoService.buscarPorId(id);
-        if (produtoEncontrado ==null){
-            return ResponseEntity.notFound().build();
-        }
-        return  ResponseEntity.ok(produtoEncontrado);
-        }
-
-    @PutMapping("/{id}")
-    public  ResponseEntity<Produto>alterar(@PathVariable int id, @RequestBody Produto produtoEditado){
-       Produto produtoEncontrado = produtoService.buscarPorId(id);
-        if (produtoEncontrado == null){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(produtoService.salvar(produtoEditado));
+        return ResponseEntity.ok(produtoService.findAll());
     }
 
-    @PutMapping("/vender/{idCaixa}/{quantidadeVendida}")
-    public ResponseEntity<String> vender(
-            @RequestBody Produto produto,
-            @PathVariable int quantidadeVendida,
-            @PathVariable int idCaixa){
+    @GetMapping("/{id}")
+    public ResponseEntity<Produto>findById(@PathVariable int id){
+        Produto produtoEncontrado=produtoService.findById(id);
 
-        Caixa caixa = caixaService.buscarPorId(idCaixa);
-        if (!caixa.isStatus()) {
-            return ResponseEntity.ok("O caixa com código " + idCaixa + "está fechado. não é possivel realizar venda!");
-        }
-
-        //busca o objeto atualizado no banco de dados com base no id informado no corpo da requisicao
-        Produto produtoAtual = produtoService.buscarPorId(produto.getId());
-
-        //validar a quantidade de estoque para realizar ou nao a venda do produto.
-
-        if (produtoAtual.getQuantidade() < quantidadeVendida){
-            return ResponseEntity.ok("estoque insulficiente para venda do produto");
-        }
-
-        //atualizando a quantidade do produto, subtraindo com base na quantidade  recebida na requisição
-        produtoAtual.setQuantidade(produtoAtual.getQuantidade() - quantidadeVendida);
-        produtoService.salvar(produtoAtual);
-
-        //descobrir o valor total da venda
-        Double totalVenda = quantidadeVendida * produtoAtual.getPreco();
-
-        //atualizar o saldo do caixa
-
-        caixa = caixaService.realizarMovimentacao(idCaixa,totalVenda ,"ENTRADA");
-
-        //Concatenando os valores para montar um recibo da movimentação, tanto no produto quanto no caixa.
-        String recibo = "Produto vendido: " + produtoAtual.getNome() +
-                "\n Total da venda: " + totalVenda +
-                "\n Caixa atualizado " + idCaixa +
-                "\n Saldo atual do caixa: " + caixa.getSaldo();
-
-        return ResponseEntity.ok(recibo);
-
-    }
-
-
-
-    @PutMapping("/comprar/{idCaixa}/{quantidade}")
-    public ResponseEntity<String> comprar(
-            @RequestBody Produto produto,
-            @PathVariable int quantidade,
-            @PathVariable int idCaixa){
-
-       //verificando se o caixa esta ativo
-
-        Caixa caixa = caixaService.buscarPorId(idCaixa);
-        if (!caixa.isStatus()) {
-            return ResponseEntity.ok("O caixa com código " + idCaixa + "está fechado! Não é possivel comprar.");
-        }
-        Produto produtoAtual = produtoService.buscarPorId(produto.getId());
-
-        Double totalCompra = quantidade * produtoAtual.getPreco();
-
-        if (caixa.getSaldo() < totalCompra){
-            return ResponseEntity.ok("Saldo insuficiente para realizar a compra!");
-        }
-        produtoAtual.setQuantidade(produtoAtual.getQuantidade() + quantidade);
-        produtoService.salvar(produtoAtual);
-
-        caixa = caixaService.realizarMovimentacao(idCaixa,totalCompra ,"SAIDA");
-
-        String recibo = "Produto Comprado: " + produtoAtual.getNome() +
-                "\n Total da Compra: " + totalCompra +
-                "\n Caixa atualizado " + idCaixa +
-                "\n Saldo atual do caixa: " + caixa.getSaldo();
-
-        return ResponseEntity.ok(recibo);
-
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Produto>excluir(@PathVariable int id){
-        Produto produtoEncontrado = produtoService.buscarPorId(id);
-        if (produtoEncontrado == null){
+        if(produtoEncontrado==null){
             return ResponseEntity.notFound().build();
         }
-        produtoService.excluir(produtoEncontrado);
         return ResponseEntity.ok(produtoEncontrado);
     }
 
+    @PostMapping("/novo")
+    public ResponseEntity<Produto> add(@RequestBody Produto produto) {
 
+        return ResponseEntity.ok(produtoService.save(produto));
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Produto>update(@RequestBody Produto produto, @PathVariable int id){
+        Produto produtoEncontrado = produtoService.findById(id);
+
+        if (produtoEncontrado == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(produtoService.save(produto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Produto>delete (@PathVariable int id){
+        Produto produtoEncontrado = produtoService.findById(id);
+
+        if (produtoEncontrado == null){
+            return ResponseEntity.notFound().build();
+        }
+        produtoService.delete(produtoEncontrado);
+        return ResponseEntity.ok(produtoEncontrado);
+
+    }
+
+    @PostMapping("/vender/{quantidade}/{idCaixa}")
+    public ResponseEntity<String> venderProduto(@RequestBody  Produto produto, @PathVariable int quantidade, @PathVariable  int idCaixa) {
+
+        //Busca o objeto atualizado no banco de dados com base no id informado no corpo da requisiçao
+        Produto produtoAtual = produtoService.findById(produto.getId());
+        Caixa caixa = caixaService.findById(idCaixa);
+        if (!caixa.isStatus()) {
+            return ResponseEntity.ok("Não foi possível realizar a venda pois o caixa "+ idCaixa + " está fechado.");
+
+        }
+        if (produtoAtual.getQuantidade()<quantidade ) {
+            return ResponseEntity.ok("Estoque insuficiente para venda.");
+        }
+        produtoAtual.setQuantidade(produtoAtual.getQuantidade()-quantidade);
+        produtoService.save(produtoAtual);
+
+        //Valor entrada
+        double valorVenda= produto.getPreco()*quantidade;
+
+        //atualizar o saldo do caixa
+        caixa = caixaService.realizarMovimentacao(idCaixa, valorVenda, "entrada");
+
+        String recibo = "" +
+                "Produto vendido: "+ produtoAtual.getNome() +
+                "\n Valor Total da venda: R$ " + valorVenda +
+                "\n Caixa atualizado: " + idCaixa +
+                "\n Saldo atual do caixa: " + caixa.getSaldo();
+        return ResponseEntity.ok(recibo);
+    }
+
+
+    @PostMapping("/comprar/{quantidade}/{idCaixa}")
+    public ResponseEntity<String> comprarProduto(@RequestBody  Produto produto, @PathVariable int quantidade, @PathVariable  int idCaixa) {
+
+        //Busca o objeto atualizado no banco de dados com base no id informado no corpo da requisiçao
+
+        Caixa caixa = caixaService.findById(idCaixa);
+        if (!caixa.isStatus()) {
+            return ResponseEntity.ok("Não foi possível realizar a compra pois o caixa "+ idCaixa + " está fechado.");
+
+        }
+
+        Produto produtoAtual = produtoService.findById(produto.getId());
+        //Valor compra
+        double valorCompra= produto.getPreco()*quantidade;
+
+        if (caixa.getSaldo()<valorCompra){
+            return ResponseEntity.ok("Saldo insufieciente para compra.");
+        }
+
+        produtoAtual.setQuantidade(produtoAtual.getQuantidade()+quantidade);
+        produtoService.save(produtoAtual);
+
+        //atualizar o saldo do caixa
+        caixa = caixaService.realizarMovimentacao(idCaixa, valorCompra, "saida");
+
+        String recibo = "" +
+                "Produto comprado: "+ produtoAtual.getNome() +
+                "\n Valor Total da compra: R$ " + valorCompra +
+                "\n Caixa atualizado: " + idCaixa +
+                "\n Saldo atual do caixa: " + caixa.getSaldo();
+        return ResponseEntity.ok(recibo);
+    }
 
 }
+

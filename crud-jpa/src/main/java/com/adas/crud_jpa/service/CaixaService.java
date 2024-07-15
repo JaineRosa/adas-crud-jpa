@@ -13,31 +13,47 @@ public class CaixaService {
     @Autowired
     private CaixaRepository caixaRepository;
 
-    public List<Caixa> buscarTodos(){
-        return caixaRepository.findAll();
-    }
-    public Caixa buscarPorId(Integer id){
-        return  caixaRepository.findById(id).orElse(null);
-    }
-    public Caixa salvar(Caixa caixa){
+    Double entradas=0.0;
+    Double saidas=0.0;
+
+    public Caixa save(Caixa caixa) {
         return caixaRepository.save(caixa);
     }
-    public  void excluir(Caixa caixa){
+
+    public List<Caixa> findAll(){
+        return caixaRepository.findAll();
+    }
+
+    public Caixa findById(int id){
+        return caixaRepository.findById(id).orElse(null);
+    }
+
+
+    public void delete (Caixa caixa){
         caixaRepository.delete(caixa);
     }
 
-    public Caixa realizarMovimentacao(int id, Double valor, String acao){
-        Caixa caixa = buscarPorId(id);
 
-        if(acao.equalsIgnoreCase("SAIDA")){
-            caixa.setSaldo(caixa.getSaldo() - valor);
-        } else if (acao.equalsIgnoreCase("ENTRADA")){
+    public Caixa realizarMovimentacao(int id, Double valor, String acao) {
+        Caixa caixa = findById(id);
+
+        if (acao.equalsIgnoreCase("entrada")) {
             caixa.setSaldo(caixa.getSaldo() + valor);
+            save(caixa);
+            entradas=entradas+valor;
+        } else if (acao.equalsIgnoreCase("saida")) {
+            caixa.setSaldo(caixa.getSaldo() - valor);
+            save(caixa);
+            saidas=saidas+valor;
         }
-      return  salvar(caixa);
+        return save(caixa);
     }
 
+    public Double mostrarEntradas() {
+        return entradas;
+    }
 
-
-
+    public Double mostrarSaidas() {
+        return saidas;
+    }
 }

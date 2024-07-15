@@ -15,43 +15,48 @@ public class CategoriaController {
     @Autowired
     private CategoriaService categoriaService;
 
-    @PostMapping
-    public ResponseEntity<Categoria> cadastrar(@RequestBody Categoria novaCategoria){
-        return ResponseEntity.ok(categoriaService.salvar(novaCategoria));
-    }
-    @GetMapping()
-    public ResponseEntity<List<Categoria>> buscarTodos(){
-            return  ResponseEntity.ok(categoriaService.buscarTodos());
+    @GetMapping("/todas")
+    public ResponseEntity<List<Categoria>> listarTodasCategorias() {
+
+        return ResponseEntity.ok(categoriaService.buscarTodos());
     }
 
     @GetMapping("/{id}")
-    public  ResponseEntity<Categoria> buscarPorId(@PathVariable int id){
-        Categoria categoriaEncontrada= categoriaService.buscarPorId(id);
-        if( categoriaEncontrada == null){
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Categoria>buscarPorId(@PathVariable int id){
+        Categoria categoriaEncontrada=categoriaService.buscarPorId(id);
 
+        if(categoriaEncontrada==null){
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(categoriaEncontrada);
     }
 
+    @PostMapping("/nova")
+    public ResponseEntity<Categoria> cadastrarNovaCategoria(@RequestBody Categoria categoria) {
+
+        return ResponseEntity.ok(categoriaService.salvar(categoria));
+    }
+
+
     @PutMapping("/{id}")
-    public  ResponseEntity<Categoria>alterar(@PathVariable int id, @RequestBody Categoria categoriaEditada){
+    public ResponseEntity<Categoria>alterar(@RequestBody Categoria categoria, @PathVariable int id){
         Categoria categoriaEncontrada = categoriaService.buscarPorId(id);
+
         if (categoriaEncontrada == null){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(categoriaService.salvar(categoriaEditada));
+        return ResponseEntity.ok(categoriaService.salvar(categoria));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Categoria>excluir(@PathVariable int id){
+    public ResponseEntity<Categoria> excluir (@PathVariable int id){
         Categoria categoriaEncontrada = categoriaService.buscarPorId(id);
+
         if (categoriaEncontrada == null){
             return ResponseEntity.notFound().build();
         }
         categoriaService.excluir(categoriaEncontrada);
         return ResponseEntity.ok(categoriaEncontrada);
+
     }
-
 }
-
