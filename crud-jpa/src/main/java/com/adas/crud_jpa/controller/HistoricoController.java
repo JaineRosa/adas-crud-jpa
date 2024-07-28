@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -31,11 +32,10 @@ public class HistoricoController {
     }
 
     @PostMapping("/novo")
-    public ResponseEntity<Historico> cadastrarNovoHistorico(@RequestBody Historico historico) {
-
-        return ResponseEntity.ok(historicoService.salvar(historico));
+    public ResponseEntity<Historico> cadastrarNovoHistorico(@RequestBody Historico novoHistorico) {
+        novoHistorico.setDataTransacao(LocalDateTime.now());
+        return ResponseEntity.ok(historicoService.salvar(novoHistorico));
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Historico>alterar(@RequestBody Historico historico, @PathVariable int id){
@@ -58,5 +58,11 @@ public class HistoricoController {
         return ResponseEntity.ok(historicoEncontrado);
 
     }
+
+    @GetMapping("/relatorio")
+    public ResponseEntity<List<Object[]>> relatorio(){
+        return ResponseEntity.ok(historicoService.historicoClienteProduto());
+    }
+
 }
 
