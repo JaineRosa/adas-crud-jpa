@@ -29,11 +29,13 @@ public class Produto {
     @NonNull
     private Integer quantidade;
 
+    //Vinculando varios registros da tabela Produto com um único registro da tabela Categoria.
+    //A tabela Produto recebe a chave primaria de categoria como chave estrangeira dentro do campo categoria_id.
     @ManyToOne
     @JoinColumn(name="categoria_id")
     private Categoria categoria;
 
-    @ManyToMany(mappedBy = "produtos")
+    @ManyToMany(mappedBy = "produtosCaixa")
     private List<Caixa> caixas;
 
     @ManyToMany

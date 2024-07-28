@@ -3,6 +3,8 @@ package com.adas.crud_jpa.service;
 import com.adas.crud_jpa.model.Produto;
 import com.adas.crud_jpa.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,5 +30,22 @@ public class ProdutoService {
     public void delete (Produto produto){
         produtoRepository.delete(produto);
     }
+
+    public List<Produto> findByExactNome(String nome) {
+        return produtoRepository.findByExactNome(nome);
+    }
+
+    public List<Produto> findBySimilarNome(String nome) {
+        return produtoRepository.findBySimilarNome(nome);
+    }
+
+    public List<Produto> findByPrecoMaiorQue(Double preco) {
+        return produtoRepository.findByPrecoMaiorQue(preco);
+    }
+
+    public List<Produto> findbyCategoriaPorCodigo(Integer codigo) {
+        return produtoRepository.findbyCategoriaPorCodigo(codigo);
+    }
+
 
 }

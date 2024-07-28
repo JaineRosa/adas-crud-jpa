@@ -17,13 +17,12 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @NonNull
-    private String nome;
 
-    @NonNull
+    private String nome;
+    private String cpf;
     private String email;
 
-    @OneToMany(mappedBy = "cliente")
-    private List<Historico> historicos;
+//    @OneToMany(mappedBy = "cliente")
+//    private List<Historico> historicos;
 
 }
