@@ -29,4 +29,6 @@ public class CategoriaService {
         categoriaRepository.delete(categoria);
     }
 
+   public List<Categoria> findByNomeContainingIgnoreCase(String nome){ return categoriaRepository.findByNomeContainingIgnoreCase(nome);}
+
 }

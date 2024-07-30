@@ -31,6 +31,13 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaEncontrada);
     }
 
+    @GetMapping("/nome/{nome}")
+        public List<Categoria> findByNome(@PathVariable String nome){
+        return categoriaService.findByNomeContainingIgnoreCase(nome);
+        }
+
+   
+
     @PostMapping("/nova")
     public ResponseEntity<Categoria> cadastrarNovaCategoria(@RequestBody Categoria categoria) {
 
