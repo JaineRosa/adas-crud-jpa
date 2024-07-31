@@ -36,7 +36,7 @@ public class CategoriaController {
         return categoriaService.findByNomeContainingIgnoreCase(nome);
         }
 
-   
+
 
     @PostMapping("/nova")
     public ResponseEntity<Categoria> cadastrarNovaCategoria(@RequestBody Categoria categoria) {

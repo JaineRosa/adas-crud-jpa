@@ -6,10 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/produto")
@@ -66,6 +64,11 @@ public class ProdutoController {
     public ResponseEntity<List<Produto>> findbyCategoriaPorCodigo(@PathVariable Integer codigo) {
 
             return ResponseEntity.ok(produtoService.findbyCategoriaPorCodigo(codigo));
+    }
+
+    @GetMapping("/categoria/nome/{categoriaNome}")
+    public ResponseEntity<List<Produto>> findProdutosByCategoriaNome(@PathVariable String categoriaNome){
+        return ResponseEntity.ok(produtoService.findProdutosByCategoriaNome(categoriaNome));
     }
 
     @GetMapping("/categoria/ativa/{codigo}")
